@@ -4,31 +4,6 @@ metadata:
   name: argocd-app-v1-ns
 ---
 apiVersion: v1
-kind: Pod
-metadata:
-  name: argocd-app-v1-pod
-  namespace: argocd-app-v1-ns
-  labels:
-    app: argocd-app-v1-pod
-    env: dev
-spec:
-  containers:
-  - name: argocd-app-v1-container
-    image: yeasy/simple-web:latest
-    ports:
-    - name: http
-      containerPort: 80
-      protocol: TCP
-    resources:
-      limits:
-        cpu: 200m
-        memory: 128Mi
-      requests:
-        cpu: 100m
-        memory: 128Mi
-    imagePullPolicy: Always
----
-apiVersion: v1
 kind: Service
 metadata:
   name: argocd-app-v1-service
@@ -45,3 +20,39 @@ spec:
     app: argocd-app-v1-pod
     env: dev
   type: ClusterIP
+---
+apiVersion: deployment.apps/v1
+kind: Deployment
+metadata:
+  name: argocd-app-v1-deployment
+  namespace: argocd-app-v1-ns
+  labels:
+    app: argocd-app-v1-pod
+    env: dev
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: argocd-app-v1-pod
+      env: dev
+  template:
+    metadata:
+      labels:
+        app: argocd-app-v1-pod
+        env: dev
+    spec:
+      containers:
+      - name: argocd-app-v1-container
+        image: yeasy/simple-web:latest
+        ports:
+        - name: http
+          containerPort: 80
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 200m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        imagePullPolicy: Always
